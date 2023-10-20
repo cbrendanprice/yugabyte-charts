@@ -180,6 +180,7 @@ Services:
 ##
 istioCompatibility:
   enabled: false
+  excludeYsqlPortDuringCredentialsSetup: false
 
 ## Settings required when using multicluster environment.
 multicluster:
@@ -485,7 +486,41 @@ ip_version_support: "v4_only" # v4_only, v6_only are the only supported values a
 
 # For more https://docs.yugabyte.com/latest/reference/configuration/yugabyted/#environment-variables
 authCredentials:
+  cassandra:
+    password: "cassandra"
+    # the specified secret must have a `password` key.
+    #
+    # NOTE: when providing `existingSecret` the above `password` value will be used to authenticate
+    #       as cassandra when issuing the password update request.
+    #
+    # Example:
+    #   apiVersion: v1
+    #   kind: Secret
+    #   metadata: ...
+    #   type: Opaque
+    #   data:
+    #     password: ******
+    existingSecret: ""
+  ycql:
+    # NOTE: the user `cassandra` is forbidden here. use the `authCredentials`.`cassandra` config object
+    #       above to manager it.
+    user: ""
+    # ignored if `existingSecret` set.
+    password: ""
+    keyspace: ""
+    # the specified secret must have a `password` key. a `user` key may also be optionally defined.
+    # Example:
+    #   apiVersion: v1
+    #   kind: Secret
+    #   metadata: ...
+    #   type: Opaque
+    #   data:
+    #     password: ******
+    #     user: ******
+    existingSecret: ""
   ysql:
+    # NOTE: the user `yugabyte` is forbidden here. use the `authCredentials`.`yugabyte` config object
+    #       below to manager it.
     user: ""
     # ignored if `existingSecret` set.
     password: ""
@@ -500,12 +535,13 @@ authCredentials:
     #     password: ******
     #     user: ******
     existingSecret: ""
-  ycql:
-    user: ""
-    # ignored if `existingSecret` set.
-    password: ""
-    keyspace: ""
-    # the specified secret must have a `password` key. a `user` key may also be optionally defined.
+  yugabyte:
+    password: "yugabyte"
+    # the specified secret must have a `password` key.
+    #
+    # NOTE: when providing `existingSecret` the above `password` value will be used to authenticate
+    #       as yugabyte when issuing the password update request.
+    #
     # Example:
     #   apiVersion: v1
     #   kind: Secret
@@ -513,7 +549,6 @@ authCredentials:
     #   type: Opaque
     #   data:
     #     password: ******
-    #     user: ******
     existingSecret: ""
 
 oldNamingStyle: true
