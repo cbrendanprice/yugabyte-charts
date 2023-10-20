@@ -180,6 +180,7 @@ Services:
 ##
 istioCompatibility:
   enabled: false
+  excludeYsqlPortDuringCredentialsSetup: false
 
 ## Settings required when using multicluster environment.
 multicluster:
