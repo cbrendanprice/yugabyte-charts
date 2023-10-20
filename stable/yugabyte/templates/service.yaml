@@ -537,10 +537,10 @@ spec:
               --num_cpus={{ ceil $root.Values.resource.tserver.requests.cpu }} \
               --undefok=num_cpus,enable_ysql \
               --use_node_hostname_for_local_tserver=true \
-            {{- if $root.Values.authCredentials.ysql.password }}
+            {{- if or $root.Values.authCredentials.ysql.password $root.Values.authCredentials.ysql.existingSecret }}
               --ysql_enable_auth=true \
             {{- end }}
-            {{- if or $root.Values.authCredentials.ycql.user $root.Values.authCredentials.ycql.password }}
+            {{- if or $root.Values.authCredentials.ycql.user $root.Values.authCredentials.ycql.password $root.Values.authCredentials.ycql.existingSecret }}
               --use_cassandra_authentication=true \
             {{- end }}
             {{- range $flag, $override := $root.Values.gflags.tserver }}

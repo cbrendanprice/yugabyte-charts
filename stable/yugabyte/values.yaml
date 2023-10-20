@@ -487,12 +487,34 @@ ip_version_support: "v4_only" # v4_only, v6_only are the only supported values a
 authCredentials:
   ysql:
     user: ""
+    # ignored if `existingSecret` set.
     password: ""
     database: ""
+    # the specified secret must have a `password` key. a `user` key may also be optionally defined.
+    # Example:
+    #   apiVersion: v1
+    #   kind: Secret
+    #   metadata: ...
+    #   type: Opaque
+    #   data:
+    #     password: ******
+    #     user: ******
+    existingSecret: ""
   ycql:
     user: ""
+    # ignored if `existingSecret` set.
     password: ""
     keyspace: ""
+    # the specified secret must have a `password` key. a `user` key may also be optionally defined.
+    # Example:
+    #   apiVersion: v1
+    #   kind: Secret
+    #   metadata: ...
+    #   type: Opaque
+    #   data:
+    #     password: ******
+    #     user: ******
+    existingSecret: ""
 
 oldNamingStyle: true
 
