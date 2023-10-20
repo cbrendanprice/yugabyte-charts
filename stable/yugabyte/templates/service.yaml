@@ -135,7 +135,9 @@ spec:
   selector:
     {{- include "yugabyte.appselector" ($appLabelArgs) | indent 4 }}
   type: {{ $endpoint.type }}
+  {{- if or (eq $endpoint.type "LoadBalancer") (eq $endpoint.type "NodePort") }}
   externalTrafficPolicy: {{ $endpoint.externalTrafficPolicy | default "Cluster" }}
+  {{- end }}
   {{- if $endpoint.loadBalancerIP }}
   loadBalancerIP: {{ $endpoint.loadBalancerIP }}
   {{- end }}
@@ -603,6 +605,73 @@ spec:
           {{- $root.Values.tserver.extraVolumeMounts | toYaml | nindent 10 -}}
           {{- end -}}
 
+      {{ if and (eq .name "yb-tservers") (or $root.Values.authCredentials.cassandra.existingSecret $root.Values.authCredentials.ycql.existingSecret $root.Values.authCredentials.ysql.existingSecret $root.Values.authCredentials.yugabyte.existingSecret) }}
+      - name: update-credentials
+        image: "{{ $root.Values.Image.repository }}:{{ $root.Values.Image.tag }}"
+        imagePullPolicy: {{ $root.Values.Image.pullPolicy }}
+        env:
+        {{- if and $root.Values.authCredentials.cassandra.password $root.Values.authCredentials.cassandra.existingSecret }}
+        - name: CASSANDRA_USER_PREVIOUS_PASSWORD
+          value: "{{ $root.Values.authCredentials.cassandra.password | trim }}"
+        - name: CASSANDRA_UPDATE_CREDENTIALS
+          value: "1"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ycql.keyspace }}
+        - name: YCQL_KEYSPACE
+          value: "{{ $root.Values.authCredentials.ycql.keyspace | trim }}"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ycql.user }}
+        - name: YCQL_USER
+          value: "{{ $root.Values.authCredentials.ycql.user | trim }}"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ycql.existingSecret }}
+        - name: YCQL_UPDATE_CREDENTIALS
+          value: "1"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ysql.database }}
+        - name: YSQL_DB
+          value: "{{ $root.Values.authCredentials.ysql.database | trim }}"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ysql.user }}
+        - name: YSQL_USER
+          value: "{{ $root.Values.authCredentials.ysql.user | trim }}"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ysql.existingSecret }}
+        - name: YSQL_UPDATE_CREDENTIALS
+          value: "1"
+        {{- end }}
+        {{- if and $root.Values.authCredentials.yugabyte.password $root.Values.authCredentials.yugabyte.existingSecret }}
+        - name: YUGABYTE_USER_PREVIOUS_PASSWORD
+          value: "{{ $root.Values.authCredentials.yugabyte.password | trim }}"
+        - name: YUGABYTE_UPDATE_CREDENTIALS
+          value: "1"
+        {{- end }}
+        {{- if $root.Values.tls.enabled }}
+        - name: SSL_CERTFILE
+          value: "{{ $root.Values.tls.certManager.enabled | ternary "/home/yugabyte/cert-manager" "/opt/certs/yugabyte" }}/root.crt"
+        {{- end }}
+        command:
+        - bash
+        - -c
+        - bash /home/yugabyte/bin/setup-credentials/setup-credentials.sh
+        volumeMounts:
+        - name: setup-credentials-script
+          mountPath: "/home/yugabyte/bin/setup-credentials"
+        {{- if $root.Values.authCredentials.ycql.existingSecret }}
+        - name: yugabyte-ycql-auth-credentials
+          mountPath: "/root/.yugabytedb-auth/ycql/"
+        {{- end }}
+        {{- if $root.Values.authCredentials.ysql.existingSecret }}
+        - name: yugabyte-ysql-auth-credentials
+          mountPath: "/root/.yugabytedb-auth/ysql/"
+        {{- end }}
+        {{- if $root.Values.tls.enabled }}
+        - name: {{ $root.Values.oldNamingStyle | ternary (printf "%s-yugabyte-tls-cert" .label) (printf "%s-%s-tls-cert" (include "yugabyte.fullname" $root) .label) }}
+          mountPath: {{ $root.Values.tls.certManager.enabled | ternary "/home/yugabyte/cert-manager" "/opt/certs/yugabyte" }}
+          readOnly: true
+          {{- end }}
+      {{- end }}
+
       {{ if not $root.Values.storage.ephemeral }}
       - name: yb-cleanup
         image: "{{ $root.Values.Image.repository }}:{{ $root.Values.Image.tag }}"
@@ -701,6 +770,35 @@ spec:
             defaultMode: 0755
         - name: tserver-tmp
           emptyDir: {}
+        {{- if or $root.Values.authCredentials.ycql.existingSecret $root.Values.authCredentials.ysql.existingSecret }}
+        - name: setup-credentials-script
+          configMap:
+            name: {{ include "yugabyte.fullname" $root }}-setup-credentials-script
+        {{- if $root.Values.authCredentials.cassandra.existingSecret }}
+        - name: yugabyte-cassandra-auth-credentials
+          secret:
+            secretName: {{ $root.Values.authCredentials.cassandra.existingSecret | trim }}
+            defaultMode: 256
+        {{- end }}
+        {{- if $root.Values.authCredentials.ycql.existingSecret }}
+        - name: yugabyte-ycql-auth-credentials
+          secret:
+            secretName: {{ $root.Values.authCredentials.ycql.existingSecret | trim }}
+            defaultMode: 256
+        {{- end }}
+        {{- if $root.Values.authCredentials.ysql.existingSecret }}
+        - name: yugabyte-ysql-auth-credentials
+          secret:
+            secretName: {{ $root.Values.authCredentials.ysql.existingSecret | trim }}
+            defaultMode: 256
+        {{- end }}
+        {{- if $root.Values.authCredentials.yugabyte.existingSecret }}
+        - name: yugabyte-yugabyte-auth-credentials
+          secret:
+            secretName: {{ $root.Values.authCredentials.yugabyte.existingSecret | trim }}
+            defaultMode: 256
+        {{- end }}
+        {{- end }}
         {{- end }}
         {{ if not $root.Values.storage.ephemeral }}
         {{- range $index := until (int ($storageInfo.count)) }}
