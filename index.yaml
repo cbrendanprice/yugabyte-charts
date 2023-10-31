@@ -5,6 +5,28 @@ entries:
       charts.openshift.io/name: yugabyte
     apiVersion: v2
     appVersion: 2.19.2.0-b121
+    created: "2023-10-31T20:31:46.129251949Z"
+    description: YugabyteDB is the high-performance distributed SQL database for building
+      global, internet-scale apps.
+    digest: 3832fce2372555de565d9046036df3e1ff379a4f1f79c679719bf30e126c2b4a
+    home: https://www.yugabyte.com
+    icon: https://avatars0.githubusercontent.com/u/17074854?s=200&v=4
+    kubeVersion: '>=1.17.0-0'
+    maintainers:
+    - email: sanketh@yugabyte.com
+      name: Sanketh Indarapu
+    - email: gjalla@yugabyte.com
+      name: Govardhan Reddy Jalla
+    name: yugabyte
+    sources:
+    - https://github.com/yugabyte/yugabyte-db
+    urls:
+    - https://github.com/cbrendanprice/yugabyte-charts/releases/download/yugabyte-2.19.6/yugabyte-2.19.6.tgz
+    version: 2.19.6
+  - annotations:
+      charts.openshift.io/name: yugabyte
+    apiVersion: v2
+    appVersion: 2.19.2.0-b121
     created: "2023-10-31T20:10:35.76603948Z"
     description: YugabyteDB is the high-performance distributed SQL database for building
       global, internet-scale apps.
@@ -46,4 +68,4 @@ entries:
     urls:
     - https://github.com/cbrendanprice/yugabyte-charts/releases/download/yugaware-2.19.2/yugaware-2.19.2.tgz
     version: 2.19.2
-generated: "2023-10-31T20:10:35.902743407Z"
+generated: "2023-10-31T20:31:46.262206706Z"
