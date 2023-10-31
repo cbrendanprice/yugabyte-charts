@@ -1,0 +1,49 @@
+apiVersion: v1
+entries:
+  yugabyte:
+  - annotations:
+      charts.openshift.io/name: yugabyte
+    apiVersion: v2
+    appVersion: 2.19.2.0-b121
+    created: "2023-10-31T20:10:35.76603948Z"
+    description: YugabyteDB is the high-performance distributed SQL database for building
+      global, internet-scale apps.
+    digest: 0cd6690a48244befbf57b3b5f07d765c0af5a52d28773804b7a027dec9dd035f
+    home: https://www.yugabyte.com
+    icon: https://avatars0.githubusercontent.com/u/17074854?s=200&v=4
+    kubeVersion: '>=1.17.0-0'
+    maintainers:
+    - email: sanketh@yugabyte.com
+      name: Sanketh Indarapu
+    - email: gjalla@yugabyte.com
+      name: Govardhan Reddy Jalla
+    name: yugabyte
+    sources:
+    - https://github.com/yugabyte/yugabyte-db
+    urls:
+    - https://github.com/cbrendanprice/yugabyte-charts/releases/download/yugabyte-2.19.5/yugabyte-2.19.5.tgz
+    version: 2.19.5
+  yugaware:
+  - annotations:
+      charts.openshift.io/name: yugaware
+    apiVersion: v2
+    appVersion: 2.19.2.0-b121
+    created: "2023-10-31T20:10:35.902734606Z"
+    description: YugabyteDB Anywhere provides deployment, orchestration, and monitoring
+      for managing YugabyteDB clusters. YugabyteDB Anywhere can create a YugabyteDB
+      cluster with multiple pods provided by Kubernetes or OpenShift and logically
+      grouped together to form one logical distributed database.
+    digest: 26e2b85db59226081f92ff7831fe0eee8b37e97f57280552c6f200beb6367e15
+    home: https://www.yugabyte.com
+    icon: https://avatars0.githubusercontent.com/u/17074854?s=200&v=4
+    kubeVersion: '>=1.17.0-0'
+    maintainers:
+    - email: sanketh@yugabyte.com
+      name: Sanketh Indarapu
+    - email: gjalla@yugabyte.com
+      name: Govardhan Reddy Jalla
+    name: yugaware
+    urls:
+    - https://github.com/cbrendanprice/yugabyte-charts/releases/download/yugaware-2.19.2/yugaware-2.19.2.tgz
+    version: 2.19.2
+generated: "2023-10-31T20:10:35.902743407Z"
